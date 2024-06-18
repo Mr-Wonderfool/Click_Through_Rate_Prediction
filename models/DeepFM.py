@@ -20,11 +20,12 @@ class DeepCTR:
         self.target = None
         # hyperparameter tuning
         self.batch_size = 1024
-        self.embedding_dims = 10
-        self.hidden_size = [512, 256, 256, 256, 128]
+        self.embedding_dims = 15
+        self.hidden_size = [512, 256, 256, 128]
         self.l2_reg_linear = 0.000001
         self.l2_reg_embedding = 0.000001
         self.l2_reg_dnn = 0.001
+
     def _preprocess(self, data_path, is_test):
         data = pd.read_csv(data_path).drop(columns=['id', 'user_id'])
         data.replace('Male', 1., inplace=True)
@@ -50,7 +51,7 @@ class DeepCTR:
         """
         data_all = data.values
         train, labels = data_all[..., :-1], data_all[..., -1]
-        sm = SMOTE(sampling_strategy=.5, random_state=42)
+        sm = SMOTE(sampling_strategy=.7, random_state=42)
         X_res, y_res = sm.fit_resample(train, labels)
         combined = np.array(np.hstack((X_res, y_res[:, np.newaxis])), dtype=np.int32)
         np.random.shuffle(combined)
@@ -97,11 +98,12 @@ class DeepCTR:
         model = DeepFM(self.linear_feature_columns, self.dnn_feature_columns, 
                 dnn_hidden_units=self.hidden_size, 
                 l2_reg_linear=self.l2_reg_linear, l2_reg_embedding=self.l2_reg_embedding, l2_reg_dnn=self.l2_reg_dnn)
-        model.compile(loss="binary_crossentropy", metrics=['AUC', 'binary_crossentropy'], optimizer=Adam(lr=0.001))
+        # model = DeepFM(self.linear_feature_columns, self.dnn_feature_columns)
+        model.compile(loss="binary_crossentropy", metrics=['AUC', 'binary_crossentropy'], optimizer=Adam(lr=0.00001))
         model.fit(
             train_model_input, self.train_[self.target].values, 
             batch_size=self.batch_size,
-            epochs=15,
+            epochs=10,
             verbose=2, # change to 1 for bar information
             validation_split=.1,
             callbacks=[checkpoints, early_stopping]
