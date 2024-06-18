@@ -6,3 +6,9 @@
   - DeepFM (under construction)
 - data visualization using t-SNE
 - data augmentation using SMOTE (Synthesis Minority Over-Sampling Technique)
+#### File in model directory
+- `Decision_Tree.ipynb`: using decision tree classifier
+- `adaboost.ipynb`: using adaboost classifier
+- `DeepFM.py`: using DeepFM model in deepctr python module
+- `Final_MLP.ipynb`: using final MLP for classification
+**Notice: running DeepFM.py would require the installation of `deepctr`**
